@@ -31,7 +31,7 @@ public class StepFunctionsService {
     final TaskScheduler taskScheduler;
 
     public interface ActivityHandlerListener<INPUT, OUTPUT> {
-        OUTPUT handleActivity(INPUT input, String arn) throws Throwable;
+        OUTPUT handleActivity(INPUT input, String taskToken) throws Throwable;
     }
 
     public static class AnnotationActivityHandlerListener implements ActivityHandlerListener {
@@ -45,7 +45,7 @@ public class StepFunctionsService {
         }
 
         @Override
-        public Object handleActivity(Object o, String arn) throws Throwable {
+        public Object handleActivity(Object o, String taskToken) throws Throwable {
             try {
                 switch (method.getParameterCount()) {
                     case 0:
@@ -53,7 +53,7 @@ public class StepFunctionsService {
                     case 1:
                         return method.invoke(target, o);
                     case 2:
-                        return method.invoke(target, o, arn);
+                        return method.invoke(target, o, taskToken);
                     default:
                         throw new Exception("ActivityHandler method does not have a valid signature.");
                 }
@@ -76,7 +76,7 @@ public class StepFunctionsService {
                     Throwable activityHandlerError = null;
                     Object output = null;
                     try {
-                        output = listener.handleActivity(at.getInput(), arn);
+                        output = listener.handleActivity(at.getInput(), at.getTaskToken());
                         if (output instanceof ActivityResult) {
                             ActivityResult<?> result = (ActivityResult<?>) output;
                             if (result.isSuccess()) {

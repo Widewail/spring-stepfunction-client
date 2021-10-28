@@ -50,15 +50,20 @@ public String appendStuff(String input) {
 }
 ```
 
-Handlers that do not require input can simply have zero args. If you need to need access to the activity arn
-in the handler method you can specify a two argument method.
+Handler methods can have the following signatures
+
+`R handle()` - no args returning the output from the task.
+
+`R handle(T)` - Receive the input from the task. Return the output from the task.
+
+`R handle(T, String)` - receive the input from the task and the task token. Return the output from the task.
 
 ```java
 
 import com.widewail.spring.stepfunctions.ActivityHandler;
 
 @ActivityHandler(arn = "arn:task2")
-public String appendStuff(MyObject input, String taskArn) {
+public String appendStuff(MyObject input, String taskToken) {
     //...
 }
 ```

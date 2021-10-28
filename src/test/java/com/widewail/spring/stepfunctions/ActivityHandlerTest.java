@@ -33,9 +33,9 @@ public class ActivityHandlerTest {
         }
 
         @ActivityHandler(arn = "arn:two")
-        public Map<String,String> twoArgs(Map<String, String> o, String arn) throws Exception {
+        public Map<String,String> twoArgs(Map<String, String> o, String taskToken) throws Exception {
             assertThat(o).isNotNull();
-            assertThat(arn).isEqualTo("arn:two");
+            assertThat(taskToken).isEqualTo("arn:two-token");
             return o;
         }
 
