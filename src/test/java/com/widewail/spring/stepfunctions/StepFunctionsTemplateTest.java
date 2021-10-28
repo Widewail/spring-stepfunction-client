@@ -90,10 +90,11 @@ public class StepFunctionsTemplateTest {
     }
 
     @ParameterizedTest
-    @CsvSource({"test,String.class","{\"key\":\"value\"},Map.class"})
-    public void testFetchedTasks(String input, Class<?> type) {
+    @CsvSource({"test,java.lang.String","{\"key\":\"value\"},java.util.Map"})
+    public void testFetchedTasks(String input, String typeName) throws Exception {
         when(client.getActivityTask(any())).thenReturn(new GetActivityTaskResult().withInput(input).withTaskToken("test"));
 
+        Class type = Class.forName(typeName);
         ActivityTask<?> activityTask = fixture.waitForTask("", type);
 
         assertThat(activityTask.getTaskToken()).isEqualTo("test");
