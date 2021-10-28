@@ -62,3 +62,20 @@ public String appendStuff(MyObject input, String taskArn) {
     //...
 }
 ```
+
+Handlers may also return a value of type `ActivityResult` to control the success/failure of a task.
+
+```java
+
+import com.widewail.spring.stepfunctions.ActivityHandler;
+
+@ActivityHandler(arn = "arn:task2")
+public ActivityResult<String> doTheThing(String input) {
+    //...
+    if(success) {
+        return ActivityResult.success("return payload");
+    } else {
+        return ActivityResult.fail("error message");
+    }
+}
+```

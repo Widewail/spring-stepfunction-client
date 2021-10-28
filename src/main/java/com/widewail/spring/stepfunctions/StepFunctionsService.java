@@ -20,7 +20,7 @@ public class StepFunctionsService {
 
     private static final Logger log = LoggerFactory.getLogger(StepFunctionsService.class);
 
-    private static final Set<Class> FATAL_EXCEPTIONS = new HashSet<>(Arrays.asList(
+    private static final Set<Class<?>> FATAL_EXCEPTIONS = new HashSet<>(Arrays.asList(
             StateMachineDoesNotExistException.class,
             ActivityDoesNotExistException.class,
             InvalidArnException.class,
@@ -77,9 +77,18 @@ public class StepFunctionsService {
                     Object output = null;
                     try {
                         output = listener.handleActivity(at.getInput(), arn);
+                        if (output instanceof ActivityResult) {
+                            ActivityResult<?> result = (ActivityResult<?>) output;
+                            if (result.isSuccess()) {
+                                output = result.getPayload();
+                            } else {
+                                activityHandlerError = new RuntimeException(result.getFailureReason());
+                            }
+                        }
                     } catch (Throwable t) {
                         activityHandlerError = t;
                     }
+
 
                     if (activityHandlerError == null) {
                         log.debug("Sending activity success on {}", arn);

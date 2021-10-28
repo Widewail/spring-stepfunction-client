@@ -44,6 +44,16 @@ public class ActivityHandlerTest {
             throw new Exception("kaboom", new Exception("just be cause"));
         }
 
+        @ActivityHandler(arn = "arn:activityResultSuccess")
+        public ActivityResult<String> activityResultSuccess() throws Exception {
+            return ActivityResult.success("foo");
+        }
+
+        @ActivityHandler(arn = "arn:activityResultFail")
+        public ActivityResult<String> activityResultError() throws Exception {
+            return ActivityResult.fail("boo");
+        }
+
     }
 
     @Autowired
@@ -110,6 +120,29 @@ public class ActivityHandlerTest {
                 eq("arn:two-token"),
                 any(Map.class)
             );
+    }
+
+    @Test
+    public void testActivityResultSuccess() throws Exception {
+        CountDownLatch latch = waitForTaskCompletion("arn:activityResultSuccess", Map.of("a", "b"));
+        latch.await(1, TimeUnit.SECONDS);
+
+        verify(stepFunctionsTemplate, atLeastOnce()).sendActivitySuccess(
+                eq("arn:activityResultSuccess-token"),
+                eq("foo")
+        );
+    }
+
+    @Test
+    public void testActivityResultFailure() throws Exception {
+        CountDownLatch latch = waitForTaskCompletion("arn:activityResultFail", Map.of("a", "b"));
+        latch.await(1, TimeUnit.SECONDS);
+
+        verify(stepFunctionsTemplate, atLeastOnce()).sendActivityFailure(
+                eq("arn:activityResultFail-token"),
+                eq("boo"),
+                eq(null)
+        );
     }
 
 //
