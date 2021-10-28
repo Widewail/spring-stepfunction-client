@@ -24,6 +24,28 @@
         <aws-java-sdk.version>1.12.66</aws-java-sdk.version>
     </properties>
 
+    <developers>
+        <developer>
+            <name>Adam Burnett</name>
+            <email>adam@widewail.com</email>
+            <organization>Widewail</organization>
+            <organizationUrl>http://www.widewail.com</organizationUrl>
+        </developer>
+        <developer>
+            <name>Evan Gould</name>
+            <email>evan@widewail.com</email>
+            <organization>Widewail</organization>
+            <organizationUrl>http://www.widewail.com</organizationUrl>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
     <distributionManagement>
         <repository>
             <id>github</id>
