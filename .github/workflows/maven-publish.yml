@@ -19,27 +19,23 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK 11
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Maven Central Repository
         uses: actions/setup-java@v2
         with:
           java-version: '11'
           distribution: 'adopt'
-          server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-          settings-path: ${{ github.workspace }} # location for the settings.xml file
-
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
-
-      - uses: s4u/maven-settings-action@v2.4.1
-        with:
-          servers: |
-            [{
-                "id": "ossrh",
-                "username": "${{ secrets.SONATYPE_USERNAME }}",
-                "password": "${{ secrets.SONATYPE_PASSWORD }}"
-            }]
-
-      - name: Publish to GitHub Packages Apache Maven
-        run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+      - name: Publish package
+        run: mvn --batch-mode deploy
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
