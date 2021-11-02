@@ -8,7 +8,7 @@ import com.widewail.spring.stepfunctions.StepFunctionsBeanPostProcessor;
 import com.widewail.spring.stepfunctions.StepFunctionsService;
 import com.widewail.spring.stepfunctions.StepFunctionsTemplate;
 import com.widewail.spring.stepfunctions.WorkerNameProvider;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
@@ -39,7 +39,7 @@ public class StepFunctionsConfig {
     }
 
     @Bean
-    public StepFunctionsService stepFunctionsService(StepFunctionsTemplate stepFunctionsTemplate, TaskScheduler taskScheduler) {
+    public StepFunctionsService stepFunctionsService(StepFunctionsTemplate stepFunctionsTemplate, @Qualifier("stepfunctionsClientTaskScheduler") TaskScheduler taskScheduler) {
         return new StepFunctionsService(stepFunctionsTemplate, taskScheduler);
     }
 
