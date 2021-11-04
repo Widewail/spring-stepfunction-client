@@ -48,7 +48,7 @@ public class StepFunctionsBeanPostProcessor implements BeanPostProcessor, Ordere
     }
 
     private void validateActivityArn(String arn) {
-        if(!arn.startsWith("arn"))
+        if(!arn.isBlank() && !arn.startsWith("arn"))
             throw new BeanDefinitionValidationException(ActivityHandler.class.getSimpleName() + " must contain a valid arn.");
     }
 
