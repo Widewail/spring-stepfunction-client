@@ -12,15 +12,23 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class ActivityResult<T> {
+    public enum ActivityResultOutcome {
+        SUCCESS, FAIL, HEARTBEAT
+    }
+
     private final T payload;
     private final String failureReason;
-    private final boolean success;
+    private final ActivityResultOutcome outcome;
 
     public static <T> ActivityResult<T> fail(String reason) {
-        return new ActivityResult<>(null, reason, false);
+        return new ActivityResult<>(null, reason, ActivityResultOutcome.FAIL);
     }
 
     public static <T> ActivityResult<T> success(T payload) {
-        return new ActivityResult<>(payload, null, true);
+        return new ActivityResult<>(payload, null, ActivityResultOutcome.SUCCESS);
+    }
+
+    public static <T> ActivityResult<T> heartbeat() {
+        return new ActivityResult<>(null, null, ActivityResultOutcome.HEARTBEAT);
     }
 }

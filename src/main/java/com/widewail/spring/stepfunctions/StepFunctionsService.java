@@ -75,30 +75,38 @@ public class StepFunctionsService {
                     log.debug("Got activity for {}", arn);
                     Throwable activityHandlerError = null;
                     Object output = null;
+                    boolean heartbeat = false;
                     try {
                         output = listener.handleActivity(at.getInput(), at.getTaskToken());
                         if (output instanceof ActivityResult) {
                             ActivityResult<?> result = (ActivityResult<?>) output;
-                            if (result.isSuccess()) {
-                                output = result.getPayload();
-                            } else {
-                                activityHandlerError = new RuntimeException(result.getFailureReason());
+                            switch (result.getOutcome()) {
+                                case SUCCESS:
+                                    output = result.getPayload();
+                                    break;
+                                case FAIL:
+                                    activityHandlerError = new RuntimeException(result.getFailureReason());
+                                    break;
+                                case HEARTBEAT:
+                                    heartbeat = true;
+                                    break;
                             }
                         }
                     } catch (Throwable t) {
                         activityHandlerError = t;
                     }
 
-
-                    if (activityHandlerError == null) {
-                        log.debug("Sending activity success on {}", arn);
-                        template.sendActivitySuccess(at.getTaskToken(), output);
-                    } else {
+                    if (activityHandlerError != null) {
                         log.error("Exception invoking activity handler", activityHandlerError);
                         log.debug("Sending activity failure for {} on {}", activityHandlerError.getClass().getSimpleName(), arn);
                         template.sendActivityFailure(at.getTaskToken(),
                                 activityHandlerError.getMessage(),
                                 activityHandlerError.getCause() != null ? activityHandlerError.getCause().getMessage() : null);
+                    } else if (heartbeat) {
+                        template.sendActivityHeartbeat(at.getTaskToken());
+                    } else {
+                        log.debug("Sending activity success on {}", arn);
+                        template.sendActivitySuccess(at.getTaskToken(), output);
                     }
                 }
             } catch (Throwable t) {

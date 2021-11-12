@@ -54,6 +54,11 @@ public class ActivityHandlerTest {
             return ActivityResult.fail("boo");
         }
 
+        @ActivityHandler(arn = "arn:activityResultHeartbeat")
+        public ActivityResult<String> activityResultHeartbeat() throws Exception {
+            return ActivityResult.heartbeat();
+        }
+
     }
 
     @Autowired
@@ -142,6 +147,16 @@ public class ActivityHandlerTest {
                 eq("arn:activityResultFail-token"),
                 eq("boo"),
                 eq(null)
+        );
+    }
+
+    @Test
+    public void testActivityResultHeartbeat() throws Exception {
+        CountDownLatch latch = waitForTaskCompletion("arn:activityResultHeartbeat", Map.of("a", "b"));
+        latch.await(1, TimeUnit.SECONDS);
+
+        verify(stepFunctionsTemplate, atLeastOnce()).sendActivityHeartbeat(
+                eq("arn:activityResultHeartbeat-token")
         );
     }
 
