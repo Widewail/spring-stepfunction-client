@@ -76,6 +76,7 @@ public class StepFunctionsService {
                     Throwable activityHandlerError = null;
                     Object output = null;
                     boolean heartbeat = false;
+                    boolean abort = false;
                     try {
                         output = listener.handleActivity(at.getInput(), at.getTaskToken());
                         if (output instanceof ActivityResult) {
@@ -87,6 +88,10 @@ public class StepFunctionsService {
                                 case FAIL:
                                     activityHandlerError = new RuntimeException(result.getFailureReason());
                                     break;
+                                case CANCEL:
+                                    activityHandlerError = new RuntimeException(result.getFailureReason());
+                                    abort = true;
+                                    break;
                                 case HEARTBEAT:
                                     heartbeat = true;
                                     break;
@@ -97,7 +102,9 @@ public class StepFunctionsService {
                     }
 
                     if (activityHandlerError != null) {
-                        log.error("Exception invoking activity handler", activityHandlerError);
+                        if (!abort) {
+                            log.error("Exception invoking activity handler", activityHandlerError);
+                        }
                         log.debug("Sending activity failure for {} on {}", activityHandlerError.getClass().getSimpleName(), arn);
                         template.sendActivityFailure(at.getTaskToken(),
                                 activityHandlerError.getMessage(),

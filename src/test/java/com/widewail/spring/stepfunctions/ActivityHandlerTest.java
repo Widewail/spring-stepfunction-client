@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfiguration.class})
 public class ActivityHandlerTest {
@@ -23,17 +24,17 @@ public class ActivityHandlerTest {
     public static class TestHandlerClass {
 
         @ActivityHandler(arn = "arn:one")
-        public String doIt(String o) throws Exception{
+        public String doIt(String o) {
             return o;
         }
 
         @ActivityHandler(arn = "arn:zero")
-        public String zeroArgs() throws Exception {
+        public String zeroArgs() {
             return "hi";
         }
 
         @ActivityHandler(arn = "arn:two")
-        public Map<String,String> twoArgs(Map<String, String> o, String taskToken) throws Exception {
+        public Map<String,String> twoArgs(Map<String, String> o, String taskToken) {
             assertThat(o).isNotNull();
             assertThat(taskToken).isEqualTo("arn:two-token");
             return o;
@@ -45,17 +46,22 @@ public class ActivityHandlerTest {
         }
 
         @ActivityHandler(arn = "arn:activityResultSuccess")
-        public ActivityResult<String> activityResultSuccess() throws Exception {
+        public ActivityResult<String> activityResultSuccess() {
             return ActivityResult.success("foo");
         }
 
         @ActivityHandler(arn = "arn:activityResultFail")
-        public ActivityResult<String> activityResultError() throws Exception {
+        public ActivityResult<String> activityResultError() {
             return ActivityResult.fail("boo");
         }
 
+        @ActivityHandler(arn = "arn:activityResultCancel")
+        public ActivityResult<String> activityResultCancel() {
+            return ActivityResult.cancel("goo");
+        }
+
         @ActivityHandler(arn = "arn:activityResultHeartbeat")
-        public ActivityResult<String> activityResultHeartbeat() throws Exception {
+        public ActivityResult<String> activityResultHeartbeat() {
             return ActivityResult.heartbeat();
         }
 
@@ -86,7 +92,7 @@ public class ActivityHandlerTest {
         when(stepFunctionsTemplate.waitForTask(eq(arn), any()))
                 .thenReturn(new ActivityTask<>(input, arn + "-token"))
                 .thenAnswer(a -> {
-                    Thread.sleep(30000l);
+                    Thread.sleep(30000L);
                     return null;
                 });
         return latch;
@@ -146,6 +152,19 @@ public class ActivityHandlerTest {
         verify(stepFunctionsTemplate, atLeastOnce()).sendActivityFailure(
                 eq("arn:activityResultFail-token"),
                 eq("boo"),
+                eq(null)
+        );
+    }
+
+
+    @Test
+    public void testActivityResultCancel() throws Exception {
+        CountDownLatch latch = waitForTaskCompletion("arn:activityResultCancel", Map.of("a", "b"));
+        latch.await(1, TimeUnit.SECONDS);
+
+        verify(stepFunctionsTemplate, atLeastOnce()).sendActivityFailure(
+                eq("arn:activityResultCancel-token"),
+                eq("goo"),
                 eq(null)
         );
     }
