@@ -31,7 +31,7 @@ stepfunctions.client.workerName=worker-app
 
 ### Other configuration
 
-If you need to customize the default `ObjectMapper` instance simply provide one of your own in the application context.
+You must provide an `ObjectMapper` instance in your application context.
 
 ## Handling activities
 

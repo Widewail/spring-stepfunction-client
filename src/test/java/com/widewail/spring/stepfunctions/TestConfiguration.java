@@ -1,5 +1,6 @@
 package com.widewail.spring.stepfunctions;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.widewail.spring.stepfunctions.configuration.SchedulerConfiguration;
 import com.widewail.spring.stepfunctions.configuration.StepFunctionsConfig;
 import org.mockito.Mockito;
@@ -20,6 +21,11 @@ public class TestConfiguration {
     @Bean
     public ActivityHandlerTest.TestHandlerClass testHandlerClass(){
         return new ActivityHandlerTest.TestHandlerClass();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper(){
+        return new ObjectMapper();
     }
 
     @Bean

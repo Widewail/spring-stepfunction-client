@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.TaskScheduler;
-
 public class StepFunctionsConfig {
 
     @Bean
@@ -25,12 +24,6 @@ public class StepFunctionsConfig {
     @ConditionalOnMissingBean(StepFunctionsTemplate.class)
     public StepFunctionsTemplate stepFunctionTemplate(AWSStepFunctions client, ObjectMapper mapper, WorkerNameProvider workerNameProvider){
         return new StepFunctionsTemplate(client, mapper, workerNameProvider);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(ObjectMapper.class)
-    public ObjectMapper objectMapper(){
-        return new ObjectMapper();
     }
 
     @Bean

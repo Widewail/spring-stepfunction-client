@@ -6,7 +6,7 @@
 
     <groupId>com.widewail</groupId>
     <artifactId>spring-stepfunction-client</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
     <name>Spring Step Functions Client</name>
 
     <parent>
