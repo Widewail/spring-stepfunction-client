@@ -48,12 +48,12 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+            <id>widewail-repo-snapshot</id>
+            <url>s3://widewail-maven-repo/snapshot</url>
         </snapshotRepository>
         <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>widewail-repo-release</id>
+            <url>s3://widewail-maven-repo/release</url>
         </repository>
     </distributionManagement>
 
@@ -128,4 +128,14 @@
         </dependency>
 
     </dependencies>
+
+    <build>
+        <extensions>
+            <extension>
+                <groupId>com.gkatzioura.maven.cloud</groupId>
+                <artifactId>s3-storage-wagon</artifactId>
+                <version>2.1</version>
+            </extension>
+        </extensions>
+    </build>
 </project>
